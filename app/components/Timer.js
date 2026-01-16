@@ -73,46 +73,38 @@ export default function Timer() {
 
     // --- AUDIO & BACKGROUND HANDLING ---
     const audioCtxRef = useRef(null);
-    const silentOscRef = useRef(null); // Keep alive mechanism
+    const audioElRef = useRef(null);
+
+    useEffect(() => {
+        const audio = new Audio('https://raw.githubusercontent.com/anars/blank-audio/master/10-minutes-of-silence.mp3');
+        audio.loop = true;
+        audio.playsInline = true;
+        audio.preload = 'auto';
+        audioElRef.current = audio;
+
+        const Ctx = window.AudioContext || window.webkitAudioContext;
+        if (Ctx) audioCtxRef.current = new Ctx();
+
+        return () => {
+            if (audioElRef.current) {
+                audioElRef.current.pause();
+                audioElRef.current = null;
+            }
+            if (audioCtxRef.current) audioCtxRef.current.close();
+        };
+    }, []);
 
     const initAudio = () => {
-        // Initialize Context
-        if (!audioCtxRef.current) {
-            const Ctx = window.AudioContext || window.webkitAudioContext;
-            if (Ctx) {
-                audioCtxRef.current = new Ctx();
-            }
-        }
-
-        // Resume if suspended
         if (audioCtxRef.current && audioCtxRef.current.state === 'suspended') {
             audioCtxRef.current.resume();
         }
 
-        // --- BACKGROUND HACK: Play inaudible sound to keep thread alive ---
-        if (audioCtxRef.current && !silentOscRef.current) {
-            try {
-                // Create a silent oscillator that plays forever
-                const ctx = audioCtxRef.current;
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
-
-                osc.type = 'sine';
-                osc.frequency.value = 440; // Arbitrary
-
-                // Volume almost zero, but not completely 0 to avoid browser "optimization" stopping it
-                gain.gain.value = 0.0001;
-
-                osc.connect(gain);
-                gain.connect(ctx.destination);
-                osc.start();
-
-                silentOscRef.current = osc;
-            } catch (e) {
-                console.error("Background audio hack failed", e);
-            }
+        if (audioElRef.current && audioElRef.current.paused) {
+            audioElRef.current.play().catch(e => console.error("Background audio playback failed", e));
         }
     };
+
+
 
     const playTone = (freq, type = 'sine', duration = 0.1, delay = 0) => {
         if (!audioCtxRef.current) return;
