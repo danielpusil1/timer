@@ -1,0 +1,21 @@
+{
+  "name": "Gym Timer Pro",
+  "short_name": "Timer",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#00f260",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='%2300f260' d='M256 0C114.6 0 0 114.6 0 256s114.6 256 256 256 256-114.6 256-256S397.4 0 256 0zm0 472c-119.3 0-216-96.7-216-216S136.7 40 256 40s216 96.7 216 216-96.7 216-216 216zm0-352c-13.3 0-24 10.7-24 24v112l80 80c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-66-66V144c0-13.3-10.7-24-24-24z'/%3E%3C/svg%3E",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    },
+    {
+       "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='%2300f260' d='M256 0C114.6 0 0 114.6 0 256s114.6 256 256 256 256-114.6 256-256S397.4 0 256 0zm0 472c-119.3 0-216-96.7-216-216S136.7 40 256 40s216 96.7 216 216-96.7 216-216 216zm0-352c-13.3 0-24 10.7-24 24v112l80 80c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-66-66V144c0-13.3-10.7-24-24-24z'/%3E%3C/svg%3E",
+       "sizes": "512x512",
+       "type": "image/svg+xml"
+    }
+  ]
+}
