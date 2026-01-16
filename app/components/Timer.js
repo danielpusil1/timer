@@ -74,16 +74,15 @@ export default function Timer() {
     // --- AUDIO & BACKGROUND HANDLING ---
     const audioCtxRef = useRef(null);
     const audioElRef = useRef(null);
+    const sourceNodeRef = useRef(null); // Keep track of connection
 
     useEffect(() => {
         const audio = new Audio('https://raw.githubusercontent.com/anars/blank-audio/master/10-minutes-of-silence.mp3');
         audio.loop = true;
         audio.playsInline = true;
         audio.preload = 'auto';
+        audio.crossOrigin = "anonymous"; // Essential for Web Audio connection
         audioElRef.current = audio;
-
-        const Ctx = window.AudioContext || window.webkitAudioContext;
-        if (Ctx) audioCtxRef.current = new Ctx();
 
         return () => {
             if (audioElRef.current) {
@@ -95,12 +94,35 @@ export default function Timer() {
     }, []);
 
     const initAudio = () => {
-        if (audioCtxRef.current && audioCtxRef.current.state === 'suspended') {
-            audioCtxRef.current.resume();
+        // 1. Create Context if missing
+        if (!audioCtxRef.current) {
+            const Ctx = window.AudioContext || window.webkitAudioContext;
+            if (Ctx) audioCtxRef.current = new Ctx();
         }
 
+        const ctx = audioCtxRef.current;
+        if (!ctx) return;
+
+        // 2. Resume Context (Critical for iOS)
+        if (ctx.state === 'suspended') {
+            ctx.resume();
+        }
+
+        // 3. Connect HTML5 Audio to Web Audio Graph (The "Mixer" fix)
+        // This ensures both the silent track and our beeps share the same high-priority audio session.
+        if (audioElRef.current && !sourceNodeRef.current) {
+            try {
+                const source = ctx.createMediaElementSource(audioElRef.current);
+                source.connect(ctx.destination);
+                sourceNodeRef.current = source;
+            } catch (e) {
+                console.warn("Already connected or CORS issue", e);
+            }
+        }
+
+        // 4. Play the Silence (Keep-Alive)
         if (audioElRef.current && audioElRef.current.paused) {
-            audioElRef.current.play().catch(e => console.error("Background audio playback failed", e));
+            audioElRef.current.play().catch(e => console.error("Background play failed", e));
         }
     };
 
@@ -111,12 +133,15 @@ export default function Timer() {
         const ctx = audioCtxRef.current;
         if (config.volume <= 0.01) return;
 
+        // Ensure active state on every beep (paranoia mode for iOS)
+        if (ctx.state === 'suspended') ctx.resume();
+
         try {
             const osc = ctx.createOscillator();
             const gain = ctx.createGain();
 
             osc.frequency.value = freq;
-            osc.type = type;
+            osc.type = type === 'sine' ? 'square' : type; // Boost volume by preferring square waves
 
             osc.connect(gain);
             gain.connect(ctx.destination);
