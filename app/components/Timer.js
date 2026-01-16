@@ -72,29 +72,45 @@ export default function Timer() {
 
 
     // --- AUDIO ---
+    const audioCtxRef = useRef(null);
+
+    const initAudio = () => {
+        if (!audioCtxRef.current) {
+            const Ctx = window.AudioContext || window.webkitAudioContext;
+            if (Ctx) {
+                audioCtxRef.current = new Ctx();
+            }
+        }
+        if (audioCtxRef.current && audioCtxRef.current.state === 'suspended') {
+            audioCtxRef.current.resume();
+        }
+    };
+
     const playTone = (freq, type = 'sine', duration = 0.1, delay = 0) => {
-        const Ctx = window.AudioContext || window.webkitAudioContext;
-        if (!Ctx) return;
+        if (!audioCtxRef.current) return;
+        const ctx = audioCtxRef.current;
         if (config.volume <= 0.01) return;
 
-        // Create context on the fly for simplicity/reliability
-        const ctx = new Ctx();
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
+        try {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
 
-        osc.frequency.value = freq;
-        osc.type = type;
+            osc.frequency.value = freq;
+            osc.type = type;
 
-        osc.connect(gain);
-        gain.connect(ctx.destination);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
 
-        const now = ctx.currentTime + delay;
-        const vol = config.volume || 0.5;
+            const now = ctx.currentTime + delay;
+            const vol = config.volume || 0.5;
 
-        osc.start(now);
-        gain.gain.setValueAtTime(vol, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
-        osc.stop(now + duration);
+            osc.start(now);
+            gain.gain.setValueAtTime(vol, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+            osc.stop(now + duration);
+        } catch (e) {
+            console.error("Audio error", e);
+        }
     };
 
     const playPhaseSound = (newPhase) => {
@@ -115,7 +131,7 @@ export default function Timer() {
         }
     };
 
-    const playCountdownBeep = () => playTone(880, 'square', 0.05);
+    const playCountdownBeep = () => playTone(880, 'square', 0.1);
 
     // --- PRECISE TIMER LOGIC (Drift Correction) ---
     // We use a delta-based approach. 
@@ -202,6 +218,7 @@ export default function Timer() {
         } else {
             if (!isActive) {
                 // Starting
+                initAudio();
                 const isInitial = phase === 'WORK' && round === 1 && currentCycle === 1 && timeLeft === config.work && timeLeft === totalTime;
                 if (isInitial && config.prepare > 0) {
                     transitionTo('PREP', config.prepare);
