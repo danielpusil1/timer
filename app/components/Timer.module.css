@@ -1,0 +1,254 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 90vw;
+    max-width: 450px;
+    padding: 40px 30px;
+    border-radius: 40px;
+    transition: all 0.5s ease;
+}
+
+.timerRing {
+    position: relative;
+    width: 280px;
+    height: 280px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 2rem;
+    transition: all 0.5s ease;
+}
+
+/* Shrink timer when editing settings */
+.container.editing .timerRing {
+    transform: scale(0.8);
+    margin-bottom: 1rem;
+}
+
+.content {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.timeText {
+    font-size: 5rem;
+    font-weight: 800;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    margin-bottom: 0.5rem;
+    color: white;
+    text-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+.phaseLabel {
+    font-size: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.7);
+    text-align: center;
+}
+
+.controls {
+    display: flex;
+    gap: 1rem;
+    width: 100%;
+    justify-content: center;
+    z-index: 10;
+    flex-wrap: wrap;
+}
+
+.button {
+    background: white;
+    color: black;
+    border: none;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 16px 24px;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    text-transform: uppercase;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    min-width: 120px;
+}
+
+.button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(255, 255, 255, 0.15);
+}
+
+.button:active {
+    transform: scale(0.95);
+}
+
+.buttonSecondary {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(4px);
+}
+
+.buttonSecondary:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: white;
+}
+
+.iconButton {
+    background: transparent;
+    color: rgba(255, 255, 255, 0.6);
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 10px;
+    transition: color 0.3s;
+}
+
+.iconButton:hover {
+    color: white;
+}
+
+/* Phase specifics */
+.workMode .timeText {
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.restMode .timeText {
+    background: var(--secondary-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.cycleRestMode .timeText {
+    background: var(--tertiary-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.prepMode .timeText {
+    background: var(--prep-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Settings Panel */
+.settingsPanel {
+    width: 100%;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.inputGroup {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    gap: 10px;
+}
+
+.inputLabel {
+    display: flex;
+    flex-direction: column;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    flex: 1;
+}
+
+.input {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 8px 12px;
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-top: 4px;
+    width: 100%;
+    outline: none;
+    font-family: inherit;
+}
+
+.input:focus {
+    border-color: rgba(255, 255, 255, 0.5);
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.savedRoutines {
+    margin-top: 1.5rem;
+}
+
+.savedHeader {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.8rem;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.routineChip {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 10px 15px;
+    border-radius: 10px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.2s;
+}
+
+.routineChip:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.routineName {
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.routineDetails {
+    font-size: 0.75rem;
+    opacity: 0.6;
+}
+
+.deleteBtn {
+    background: none;
+    border: none;
+    color: #ff4757;
+    cursor: pointer;
+    padding: 5px;
+    opacity: 0.6;
+}
+
+.deleteBtn:hover {
+    opacity: 1;
+}
