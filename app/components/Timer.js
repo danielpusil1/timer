@@ -71,18 +71,46 @@ export default function Timer() {
     }, [isActive]);
 
 
-    // --- AUDIO ---
+    // --- AUDIO & BACKGROUND HANDLING ---
     const audioCtxRef = useRef(null);
+    const silentOscRef = useRef(null); // Keep alive mechanism
 
     const initAudio = () => {
+        // Initialize Context
         if (!audioCtxRef.current) {
             const Ctx = window.AudioContext || window.webkitAudioContext;
             if (Ctx) {
                 audioCtxRef.current = new Ctx();
             }
         }
+
+        // Resume if suspended
         if (audioCtxRef.current && audioCtxRef.current.state === 'suspended') {
             audioCtxRef.current.resume();
+        }
+
+        // --- BACKGROUND HACK: Play inaudible sound to keep thread alive ---
+        if (audioCtxRef.current && !silentOscRef.current) {
+            try {
+                // Create a silent oscillator that plays forever
+                const ctx = audioCtxRef.current;
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+
+                osc.type = 'sine';
+                osc.frequency.value = 440; // Arbitrary
+
+                // Volume almost zero, but not completely 0 to avoid browser "optimization" stopping it
+                gain.gain.value = 0.0001;
+
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+
+                silentOscRef.current = osc;
+            } catch (e) {
+                console.error("Background audio hack failed", e);
+            }
         }
     };
 
@@ -245,8 +273,9 @@ export default function Timer() {
 
     // ... (Helper functions: formatTime, handleConfigChange, etc. keep same) ...
     const formatTime = (seconds) => {
-        const m = Math.floor(seconds / 60);
-        const s = seconds % 60;
+        const safeSeconds = Math.max(0, seconds);
+        const m = Math.floor(safeSeconds / 60);
+        const s = safeSeconds % 60;
         return `${m}:${s < 10 ? '0' : ''}${s}`;
     };
 
